@@ -68,7 +68,6 @@ const ScheduleTest: React.FC<ScheduleTestProps> = ({ isOpen, onClose, suites, })
         if (!testName) return "Please select a test suite";
         if (!testDate) return "Please select a start date";
         if (!testTime) return "Please select a start time";
-        //if (selectedDays.length === 0) return "Please select at least one day for weekly schedule";
         
         const startDateTime = new Date(`${testDate}T${testTime}`);
         if (startDateTime < new Date()) return "Start date and time must be in the future";
