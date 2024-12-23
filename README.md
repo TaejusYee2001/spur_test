@@ -30,9 +30,13 @@ The project will be available at `http://localhost:4000` by default
 
 .
 ├── app/                             # Main directory for the Next.js App Router and pages.
+
 |   ├── (auth-pages)/
+
 |   ├── auth/
+
 |   ├── protected/
+
 |   |   ├── reset-password/
 |   |   ├── page.tsx                 # Authenticated user lands here, scheduler component is rendered here. 
 ├── components/                      # Reusable UI components to keep the code modular and DRY.
