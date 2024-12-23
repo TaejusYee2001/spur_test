@@ -1,7 +1,18 @@
-import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
+import Scheduler from "@/components/scheduler";
 import { createClient } from "@/utils/supabase/server";
-import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
+
+interface Event {
+  day: number; 
+  time: string; 
+  title: string; 
+  color: string; 
+}
+
+interface Suite {
+  id: string;
+  name: string;
+}
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
@@ -14,25 +25,49 @@ export default async function ProtectedPage() {
     return redirect("/sign-in");
   }
 
+  // Fetch scheduled tests for user
+  const { data: scheduled_tests } = await supabase.from("scheduled_tests").select();
+
+  const formatted_tests: Event[] = scheduled_tests?.map((test) => {
+    const testDate = new Date(test.start_date);
+    const testTime = new Date(test.start_date);
+    const testTitle = test.test_name;
+  
+    const testDay = testDate.getDate(); // Extract day from start_date
+  
+    let hours = testTime.getHours();
+    let minutes = testTime.getMinutes();
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes.toString();
+    const testTimeStr = `${hours}:${formattedMinutes} ${ampm}`;
+  
+    return {
+      day: testDay,
+      time: testTimeStr,
+      title: testTitle,
+      color: 'bg-blue-500', // You can customize the color
+    };
+  }) || [];
+
+  // Fetch all available test suites for user
+  const { data: test_suites } = await supabase.from("test_suites").select();
+
+  const formatted_test_suites = (test_suites: any[]) => {
+    return test_suites?.map(suite => {
+      return {
+        id: suite.id,
+        name: suite.test_name, // Rename 'test_name' to 'name'
+      };
+    }) || [];
+  };
+
+  const formatted_suites = test_suites ? formatted_test_suites(test_suites) : [];
+
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          This is a protected page that you can only see as an authenticated
-          user
-        </div>
-      </div>
-      <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          {JSON.stringify(user, null, 2)}
-        </pre>
-      </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
-      </div>
+    <div className="w-[100%]">
+      <Scheduler events={formatted_tests} suites={formatted_suites}/>
     </div>
   );
 }
