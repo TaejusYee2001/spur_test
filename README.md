@@ -26,6 +26,13 @@ npm run dev
 ```
 The project will be available at `http://localhost:4000` by default
 
+## 5. IMPORTANT: Sign In With My Credentials
+```
+email: taejusyee@gmail.com
+password: 321654
+```
+Signing in with my credentials is important because newly authenticated users will not have an associated list of test suites to choose from. These test suites have to be given to users which I am currently doing manually. 
+
 ## Project File Structure
 
 ```plaintext
