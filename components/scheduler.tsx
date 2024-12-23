@@ -1,8 +1,7 @@
-// TODO: match calendar events to unique date, not just day of the month. 
-// Should only render events which are created by authenticated user
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Clock } from "lucide-react";
 import ScheduleTest from '@/components/schedule-test';
 import { startOfWeek, addDays } from 'date-fns';
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,6 +11,7 @@ type Event = {
   time: string;
   day: number;
   color: string;
+  recurringDays: string[];
 };
 
 type Suite = {
@@ -24,9 +24,11 @@ interface ScheduleProps {
   suites: Suite[]; 
 }
 
+
 const Scheduler: React.FC<ScheduleProps> = ({ events = [], suites = [] }) => {
   const [weekStartDate, setWeekStartDate] = useState(new Date());
   const [showScheduleTest, setShowScheduleTest] = useState(false);
+  const [days, setDays] = useState<any[]>([]); // Define days as a state to update based on weekStartDate
 
   const getDaysForWeek = (startOfWeekDate: Date) => {
     const daysArray = [];
@@ -40,7 +42,11 @@ const Scheduler: React.FC<ScheduleProps> = ({ events = [], suites = [] }) => {
     return daysArray;
   };
 
-  const days = getDaysForWeek(weekStartDate);
+  useEffect(() => {
+    // Update days whenever weekStartDate changes
+    const calculatedDays = getDaysForWeek(weekStartDate);
+    setDays(calculatedDays);
+  }, [weekStartDate]); // Recalculate days only when weekStartDate changes
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -59,13 +65,15 @@ const Scheduler: React.FC<ScheduleProps> = ({ events = [], suites = [] }) => {
     setWeekStartDate(startOfWeek(new Date()));
   }, []);
 
+  if (days.length === 0) return null;
+
   return (
     <div className="p-4">
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Button
-              className="px-4 py-2 bg-blue-600 text-white rounded"
+              className="px-4 py-2 bg-blue-800 text-white rounded"
               onClick={toggleScheduleTest}
             >
               Schedule Test
@@ -93,7 +101,7 @@ const Scheduler: React.FC<ScheduleProps> = ({ events = [], suites = [] }) => {
         </div>
       </div>
 
-      {showScheduleTest && <ScheduleTest isOpen={showScheduleTest} onClose={toggleScheduleTest} suites={suites}/>}
+      {showScheduleTest && <ScheduleTest isOpen={showScheduleTest} onClose={toggleScheduleTest} suites={suites} />}
 
       <div className="border rounded-lg">
         <div className="grid grid-cols-8 border-b">
@@ -123,14 +131,21 @@ const Scheduler: React.FC<ScheduleProps> = ({ events = [], suites = [] }) => {
                     const eventTimeInMinutes = eventHourIn24 * 60 + eventMinute;
 
                     const slotTimeInMinutes = hour * 60;
-                    if (event.day === day.num && eventTimeInMinutes === slotTimeInMinutes) {
-                        
+                    const eventDate = new Date(event.day);
+                    const eventMonth = eventDate.getMonth();
+                    const currentMonth = weekStartDate.getMonth();
+
+                    if (eventMonth === currentMonth && event.day === day.num && eventTimeInMinutes >= slotTimeInMinutes && eventTimeInMinutes < slotTimeInMinutes + 60) {
                       return (
                         <div
                           key={idx}
-                          className={`absolute w-full p-3 ${event.color} text-xs rounded `}
+                          className={`absolute w-full p-1 ${event.color} text-xs rounded border border-blue-800`}
                         >
-                          {event.title}
+                          <div className="font-medium text-blue-800">{event.title}</div>
+                          <div className="flex items-center text-blue-800 text-xs">
+                            <Clock className="w-4 h-4 mr-1" />
+                            {event.time}
+                          </div>
                         </div>
                       );
                     }

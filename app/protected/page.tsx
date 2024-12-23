@@ -1,17 +1,14 @@
 import Scheduler from "@/components/scheduler";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 interface Event {
   day: number; 
   time: string; 
   title: string; 
-  color: string; 
-}
-
-interface Suite {
-  id: string;
-  name: string;
+  color: string;
+  recurringDays: string[];
 }
 
 export default async function ProtectedPage() {
@@ -47,7 +44,8 @@ export default async function ProtectedPage() {
       day: testDay,
       time: testTimeStr,
       title: testTitle,
-      color: 'bg-blue-500', // You can customize the color
+      color: 'bg-blue-200',
+      recurringDays: test.weekly_schedule
     };
   }) || [];
 
@@ -58,7 +56,7 @@ export default async function ProtectedPage() {
     return test_suites?.map(suite => {
       return {
         id: suite.id,
-        name: suite.test_name, // Rename 'test_name' to 'name'
+        name: suite.test_name, 
       };
     }) || [];
   };
@@ -70,4 +68,4 @@ export default async function ProtectedPage() {
       <Scheduler events={formatted_tests} suites={formatted_suites}/>
     </div>
   );
-}
+} 
