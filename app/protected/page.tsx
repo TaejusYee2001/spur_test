@@ -8,7 +8,8 @@ interface Event {
   time: string; 
   title: string; 
   color: string;
-  recurringDays: string[];
+  recurringDays: string;
+  start_date: string; 
 }
 
 export default async function ProtectedPage() {
@@ -45,7 +46,8 @@ export default async function ProtectedPage() {
       time: testTimeStr,
       title: testTitle,
       color: 'bg-blue-200',
-      recurringDays: test.weekly_schedule
+      recurringDays: test.weekly_schedule,
+      start_date: test.start_date
     };
   }) || [];
 

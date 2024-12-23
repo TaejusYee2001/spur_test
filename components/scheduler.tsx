@@ -11,7 +11,8 @@ type Event = {
   time: string;
   day: number;
   color: string;
-  recurringDays: string[];
+  recurringDays: string;
+  start_date: string; 
 };
 
 type Suite = {
@@ -28,7 +29,7 @@ interface ScheduleProps {
 const Scheduler: React.FC<ScheduleProps> = ({ events = [], suites = [] }) => {
   const [weekStartDate, setWeekStartDate] = useState(new Date());
   const [showScheduleTest, setShowScheduleTest] = useState(false);
-  const [days, setDays] = useState<any[]>([]); // Define days as a state to update based on weekStartDate
+  const [days, setDays] = useState<any[]>([]);
 
   const getDaysForWeek = (startOfWeekDate: Date) => {
     const daysArray = [];
@@ -36,17 +37,18 @@ const Scheduler: React.FC<ScheduleProps> = ({ events = [], suites = [] }) => {
       const currentDay = addDays(startOfWeekDate, i);
       daysArray.push({
         num: currentDay.getDate(),
+        month: currentDay.getMonth(),
         day: currentDay.toLocaleString('en-US', { weekday: 'short' }),
+        year: currentDay.getFullYear(),
       });
     }
     return daysArray;
   };
 
   useEffect(() => {
-    // Update days whenever weekStartDate changes
     const calculatedDays = getDaysForWeek(weekStartDate);
     setDays(calculatedDays);
-  }, [weekStartDate]); // Recalculate days only when weekStartDate changes
+  }, [weekStartDate]); 
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -131,11 +133,24 @@ const Scheduler: React.FC<ScheduleProps> = ({ events = [], suites = [] }) => {
                     const eventTimeInMinutes = eventHourIn24 * 60 + eventMinute;
 
                     const slotTimeInMinutes = hour * 60;
-                    const eventDate = new Date(event.day);
+                    const eventDate = new Date(event.start_date);
                     const eventMonth = eventDate.getMonth();
                     const currentMonth = weekStartDate.getMonth();
+                    
+                    const daysArray = event.recurringDays.split(",").map(day => day.toLowerCase())
+                    const eventMatchesDay = daysArray.includes(day.day.toLowerCase());
 
-                    if (eventMonth === currentMonth && event.day === day.num && eventTimeInMinutes >= slotTimeInMinutes && eventTimeInMinutes < slotTimeInMinutes + 60) {
+                    const recurringEventDate = new Date(
+                      `${day.year}-${day.month + 1}-${day.num}`
+                    );
+                    console.log(recurringEventDate)
+                    console.log(eventDate)
+
+                    const isAfterStartDate = recurringEventDate >= eventDate;
+                    console.log(isAfterStartDate)
+
+                    if ((eventMonth === currentMonth && event.day === day.num && eventTimeInMinutes >= slotTimeInMinutes && eventTimeInMinutes < slotTimeInMinutes + 60) 
+                      || (eventMatchesDay&& eventTimeInMinutes >= slotTimeInMinutes && eventTimeInMinutes < slotTimeInMinutes + 60 && isAfterStartDate)) {
                       return (
                         <div
                           key={idx}
