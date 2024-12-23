@@ -26,29 +26,26 @@ npm run dev
 ```
 The project will be available at `http://localhost:4000` by default
 
-# File Structure
+## Project File Structure
 
+```plaintext
 .
 ├── app/                             # Main directory for the Next.js App Router and pages.
-
-|   ├── (auth-pages)/
-
-|   ├── auth/
-
-|   ├── protected/
-
-|   |   ├── reset-password/
-|   |   ├── page.tsx                 # Authenticated user lands here, scheduler component is rendered here. 
+│   ├── (auth-pages)/                # Directory for authentication-related pages.
+│   ├── auth/                        # Authentication routes.
+│   ├── protected/                   # Routes and components for authenticated users.
+│   │   ├── reset-password/          # Page for resetting user passwords.
+│   │   ├── page.tsx                 # Authenticated user lands here; scheduler component is rendered.
 ├── components/                      # Reusable UI components to keep the code modular and DRY.
-|   ├── scheduler.tsx                # Implements calendar schedule component.
-|   ├── schedule-test.tsx            # Implements modal component for scheduling a test suite.
+│   ├── scheduler.tsx                # Implements calendar schedule component.
+│   ├── schedule-test.tsx            # Implements modal component for scheduling a test suite.
 ├── hooks/                           # Custom React hooks for state management and reusable logic.
-|   ├── use-scheduled-tests.ts       # Data fetching for scheduled_tests with Tanstack Query
-|   ├── use-test-suites.ts           # Data fetching for test_suites with Tanstack Query
+│   ├── use-scheduled-tests.ts       # Data fetching for `scheduled_tests` with Tanstack Query.
+│   ├── use-test-suites.ts           # Data fetching for `test_suites` with Tanstack Query.
 ├── lib/                             # Utility functions or configurations used across the project.
 ├── node_modules/                    # Directory for installed Node.js dependencies (auto-generated).
 ├── utils/                           # General utility functions and helpers.
 │   ├── providers/                   # Context providers for global state and application logic.
-|   │   ├── query-client-wrapper.tsx # Tanstack Query wrapper
+│   │   ├── query-client-wrapper.tsx # Tanstack Query wrapper.
 │   ├── supabase/                    # Supabase configuration and helpers for database interaction.
 ├── .env.local                       # Environment variables specific to local development.
